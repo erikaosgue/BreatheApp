@@ -51,6 +51,16 @@
     android:textColor="@color/teal_200"
     />
 
+  <Chronometer
+      android:id="@+id/chronometerId"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:text="2 MIN"
+      android:textSize="20sp"
+      android:textColor="@color/white"
+
+      />
+
   <TextView
     android:id="@+id/oneMinuteText"
     android:layout_width="wrap_content"

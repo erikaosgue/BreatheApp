@@ -1,18 +1,42 @@
 package com.erikaosgue.breathapp
 
+import android.app.Activity
 import android.content.Intent
+import android.icu.text.MessageFormat
+import android.os.*
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.CountDownTimer
+import androidx.annotation.RequiresApi
 import com.erikaosgue.breathapp.databinding.ActivityMainBinding
+import com.erikaosgue.breathapp.util.Prefs
 import com.github.florent37.viewanimator.ViewAnimator
 
 class MainActivity : AppCompatActivity() {
+
+	lateinit var prefs: Prefs
+
+
+
 	lateinit var  binding: ActivityMainBinding
- 	override fun onCreate(savedInstanceState: Bundle?) {
+ 	@RequiresApi(Build.VERSION_CODES.N)
+	override fun onCreate(savedInstanceState: Bundle?) {
  		super.onCreate(savedInstanceState)
  		binding = ActivityMainBinding.inflate(layoutInflater)
  		setContentView(binding.root)
+
+		prefs = Prefs(this)
+
+		binding.apply {
+
+			breathsText.text = MessageFormat.format("{0} min today", prefs.sessions)
+			todayMinutesText.text = MessageFormat.format("{0} breathes", prefs.breathes)
+			lastBreathText.text = prefs.date
+
+//			chronometerId.apply {
+//				isCountDown = true
+//				base = SystemClock.elapsedRealtime() + 100000
+//				start()
+//			}
+		}
 
 		binding.startButton.setOnClickListener{
 			startAnimation()
@@ -41,21 +65,18 @@ class MainActivity : AppCompatActivity() {
 					imageView.scaleY = 1.0f
 				}
 
-				//Refresh the Activity to put the new data
-				object : CountDownTimer(2000, 1000){
-					override fun onTick(millisUntilFinished: Long) {
-						TODO("Not yet implemented")
-					}
+				prefs.sessions = prefs.sessions + 1
+				prefs.breathes = prefs.breathes + 1
+				prefs.setDate(System.currentTimeMillis())
 
-					override fun onFinish() {
-						startActivity(Intent(applicationContext, MainActivity::class.java))
-						finish()
-					}
-
+                val handler = Handler()
+				val countDownTimer = Runnable {
+					startActivity(Intent( this@MainActivity, MainActivity::class.java))
+					finish()
 				}
 
-			}
-			.start()
+				handler.postDelayed(countDownTimer, 100)
+			}.start()
 	}
 
 	private fun startIntroAnimation(){
